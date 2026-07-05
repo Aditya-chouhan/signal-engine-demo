@@ -27,4 +27,20 @@ point: this is live, checkable data, not a fixed demo dataset.
 3. Scores genuine acceleration; deceleration scores 0 rather than a
    fabricated negative — "no signal" is an honest answer, not a penalty.
 
+## Closing the loop: `draft_outreach.py`
+
+Scoring the signal is only half of "signal-based intent orchestration." This
+second script takes the top-scoring company, pulls a few more real facts
+(description, recent releases, recent commit subjects) via GitHub's API, and
+has Claude draft a short, honest, diagnosis-style message grounded only in
+those facts — never a generic pitch.
+
+```
+export ANTHROPIC_API_KEY=sk-ant-...
+python3 draft_outreach.py
+```
+
+It only ever prints a draft. It does not send anything to anyone — the
+design rule is AI drafts, a human approves every send.
+
 Aditya Chouhan · ai.adityachouhan@gmail.com
