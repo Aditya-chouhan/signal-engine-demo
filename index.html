@@ -1,0 +1,183 @@
+<title>Signal-based prioritization, applied fresh — a Signal Engine demo</title>
+<style>
+  :root {
+    --paper: #ECEEEB;
+    --paper-raised: #F5F6F3;
+    --ink: #191D1B;
+    --ink-soft: #4B524D;
+    --ink-faint: #7B8179;
+    --line: #D6D3C8;
+    --accent: #A8641F;
+    --accent-soft: #EADFCB;
+    --flag: #9C3A2A;
+    --flag-soft: #F1E1DC;
+    --verified: #35603F;
+    --verified-soft: #DEE7DE;
+    --font-display: ui-serif, "Iowan Old Style", "Palatino Linotype", "URW Palladio", Georgia, serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 24px 96px; }
+  header.hero { background: var(--paper-raised); border-bottom: 1px solid var(--line); padding: 56px 24px 40px; margin-bottom: 56px; }
+  .hero-inner { max-width: 760px; margin: 0 auto; }
+  .eyebrow { display: flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: 12.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; }
+  .eyebrow::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+  h1 { font-family: var(--font-display); font-weight: 500; font-size: clamp(28px, 4.4vw, 40px); line-height: 1.18; letter-spacing: -0.01em; margin: 0 0 18px; text-wrap: balance; color: var(--ink); }
+  .dek { font-size: 17.5px; color: var(--ink-soft); max-width: 60ch; margin: 0; }
+  .repo-chip { display: inline-flex; align-items: baseline; gap: 8px; margin-top: 24px; font-family: var(--font-mono); font-size: 14px; background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 7px 12px; }
+  .repo-chip strong { font-weight: 600; }
+  .repo-chip span { color: var(--ink-faint); }
+  section { margin-bottom: 52px; }
+  h2 { font-family: var(--font-display); font-weight: 500; font-size: 22px; letter-spacing: -0.005em; margin: 0 0 8px; text-wrap: balance; }
+  .section-note { font-size: 13.5px; color: var(--ink-faint); margin: 0 0 20px; }
+  p { max-width: 68ch; color: var(--ink-soft); margin: 0 0 16px; }
+  p:last-child { margin-bottom: 0; }
+  p a { color: var(--accent); }
+  .table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width: 640px; }
+  thead th { text-align: left; font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-faint); font-weight: 500; padding: 12px 16px; background: var(--paper-raised); border-bottom: 1px solid var(--line); white-space: nowrap; }
+  tbody td { padding: 13px 16px; border-bottom: 1px solid var(--line); vertical-align: top; color: var(--ink); font-variant-numeric: tabular-nums; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--paper-raised); }
+  td.repo { font-family: var(--font-mono); font-size: 13px; }
+  .tag { display: inline-block; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.02em; padding: 2px 7px; border-radius: 4px; white-space: nowrap; }
+  .tag.up { background: var(--verified-soft); color: var(--verified); }
+  .tag.flat { background: var(--paper-raised); color: var(--ink-faint); }
+  .detail-card { background: var(--paper-raised); border: 1px solid var(--line); border-radius: 10px; padding: 24px 26px; }
+  .detail-card .path { font-family: var(--font-mono); font-size: 13.5px; color: var(--verified); background: var(--verified-soft); display: inline-block; padding: 3px 8px; border-radius: 5px; margin-bottom: 14px; }
+  .verdict-row { display: flex; gap: 10px; align-items: flex-start; margin-top: 18px; padding-top: 18px; border-top: 1px dashed var(--line); }
+  .verdict-badge { flex-shrink: 0; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; background: var(--accent-soft); color: var(--accent); }
+  pre { background: #14181A; color: #E4E7E2; border-radius: 10px; padding: 20px 22px; overflow-x: auto; font-family: var(--font-mono); font-size: 13px; line-height: 1.65; margin: 0; }
+  pre .c { color: #7B8179; }
+  .cta { background: var(--paper-raised); border: 1px solid var(--line); border-radius: 12px; padding: 36px 32px; text-align: left; }
+  .cta h2 { margin-bottom: 12px; }
+  .cta p { max-width: 60ch; }
+  .cta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-top: 22px; }
+  .btn { display: inline-block; background: var(--ink); color: var(--paper); font-family: var(--font-body); font-weight: 600; font-size: 14.5px; padding: 11px 20px; border-radius: 7px; text-decoration: none; border: none; cursor: pointer; }
+  .btn:hover { background: var(--accent); }
+  .cta-fineprint { font-family: var(--font-mono); font-size: 12.5px; color: var(--ink-faint); }
+  .email-line { font-family: var(--font-mono); font-size: 15px; margin-top: 4px; }
+  .email-line a { color: var(--ink); font-weight: 600; }
+  footer { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--line); font-size: 13px; color: var(--ink-faint); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  footer a { color: var(--ink-faint); }
+  @media (max-width: 560px) { header.hero { padding: 40px 20px 32px; } .detail-card, .cta { padding: 22px 20px; } }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">Live demo · public data, real numbers</div>
+    <h1>Composite signal scoring, rebuilt from scratch on public data</h1>
+    <p class="dek">The same mechanism I designed for Sydon's Amazon Signal Engine — score real activity instead of buying a static contact list — applied fresh here to open developer-tool companies, using only GitHub's public API. No Sydon code, data, or credentials anywhere in this build.</p>
+    <div class="repo-chip"><strong>8 companies scored</strong><span>— reproducible: run signal_score.py yourself, numbers will differ slightly as commit activity moves week to week</span></div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section>
+    <h2>The problem with static lead lists</h2>
+    <p>Most outbound tooling — Apollo, Clay's default enrichment, a purchased list — answers "who fits the ICP profile." It never answers "who is doing something <em>right now</em> that makes this the moment to reach out." A profile match from six months ago is stale by the time an SDR sends the email.</p>
+    <p>The fix isn't a bigger list. It's scoring real, current activity and only acting on genuine signal — the same principle whether the domain is Amazon sellers or, as shown here, open-source companies.</p>
+  </section>
+
+  <section>
+    <h2>The result — real GitHub data, pulled live</h2>
+    <p class="section-note">Composite score = trailing-4-week commit velocity vs. the 4 weeks before it. Deceleration is scored 0, not negative — a slowdown isn't a buying signal, and the honest answer to "no signal" is 0, not a fabricated penalty.</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Company / repo</th><th>Stars</th><th>Commits, last 4wk</th><th>Commits, prior 4wk</th><th>Change</th><th>Signal score</th></tr></thead>
+        <tbody>
+          <tr><td class="repo">ComposioHQ/composio</td><td>29,096</td><td>119</td><td>42</td><td><span class="tag up">+183.3%</span></td><td><b>183.3</b></td></tr>
+          <tr><td class="repo">mem0ai/mem0</td><td>60,126</td><td>152</td><td>94</td><td><span class="tag up">+61.7%</span></td><td>61.7</td></tr>
+          <tr><td class="repo">block/goose</td><td>50,669</td><td>263</td><td>185</td><td><span class="tag up">+42.2%</span></td><td>42.2</td></tr>
+          <tr><td class="repo">browser-use/browser-use</td><td>102,817</td><td>37</td><td>446</td><td><span class="tag flat">−91.7%</span></td><td>0</td></tr>
+          <tr><td class="repo">e2b-dev/E2B</td><td>12,844</td><td>64</td><td>76</td><td><span class="tag flat">−15.8%</span></td><td>0</td></tr>
+          <tr><td class="repo">langflow-ai/langflow</td><td>151,180</td><td>116</td><td>521</td><td><span class="tag flat">−77.7%</span></td><td>0</td></tr>
+          <tr><td class="repo">crewAIInc/crewAI</td><td>54,940</td><td>93</td><td>118</td><td><span class="tag flat">−21.2%</span></td><td>0</td></tr>
+          <tr><td class="repo">letta-ai/letta</td><td>23,658</td><td>2</td><td>0</td><td><span class="tag flat">n/a</span></td><td>0</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>The top signal — Composio, +183.3%</h2>
+    <div class="detail-card">
+      <span class="path">composio commit velocity: 42 → 119 commits in 4 weeks</span>
+      <p>Composio's commit volume nearly tripled between the trailing 4-week window and the 4 weeks before it — a real, verifiable acceleration, not a modeled guess. In a live GTM system, this is exactly the kind of event that should trigger a look: a sudden build-out often correlates with a funding event, a new hire wave, or a push toward a launch — all real reasons an outbound message timed to this moment lands differently than a cold list-based send.</p>
+      <div class="verdict-row">
+        <span class="verdict-badge">What this isn't</span>
+        <p style="margin:0;">This score alone doesn't prove intent — it's one signal, not a verdict. The point of the mechanism isn't "this one number replaces judgment," it's that a real, current, checkable signal is a far better trigger than a static list that doesn't know anything changed.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>The actual scoring code</h2>
+    <p class="section-note">Full script: <a href="https://github.com/Aditya-chouhan/signal-engine-demo/blob/main/signal_score.py" target="_blank" rel="noopener">signal_score.py</a> — runnable, no API key required.</p>
+    <pre><span class="c"># composite score: reward genuine acceleration only</span>
+<span class="c"># deceleration -> 0, not a fabricated negative signal</span>
+def signal_score(velocity_change_pct):
+    if velocity_change_pct is None:
+        return 0
+    return max(0, round(velocity_change_pct, 1))
+
+<span class="c"># velocity: trailing 4wk commits vs. the 4wk before that,</span>
+<span class="c"># computed from GitHub's public /stats/commit_activity endpoint</span>
+last4 = sum(w["total"] for w in activity[-4:])
+prev4 = sum(w["total"] for w in activity[-8:-4])
+change_pct = (last4 - prev4) / prev4 * 100</pre>
+  </section>
+
+  <section class="cta">
+    <h2>Why I built this</h2>
+    <p>I designed the original version of this mechanism as Head of Revenue at Sydon (YC W25) — moving the company's outbound from a static Apollo-style contact list to live, per-account signal detection. This is that same idea, rebuilt independently and cleanly on public data, to show the mechanism rather than just describe it.</p>
+    <div class="cta-row">
+      <a class="btn" href="mailto:ai.adityachouhan@gmail.com?subject=Signal%20engine%20demo" target="_top" rel="noopener">Let's talk</a>
+      <button class="btn" type="button" id="copyEmailBtn" style="border:none;cursor:pointer;">Copy email address</button>
+      <span class="cta-fineprint">Full resume: see linked profile</span>
+    </div>
+    <p class="email-line">Or write directly: <a href="mailto:ai.adityachouhan@gmail.com" target="_top" rel="noopener">ai.adityachouhan@gmail.com</a></p>
+  </section>
+
+  <footer>
+    <span>Aditya Chouhan — <a href="https://aditya-chouhan.github.io/mem0-audit-casestudy/" target="_blank" rel="noopener">another demo: the mem0 audit</a></span>
+    <a href="mailto:ai.adityachouhan@gmail.com" target="_top" rel="noopener">ai.adityachouhan@gmail.com</a>
+  </footer>
+
+</div>
+
+<script>
+  (function () {
+    var btn = document.getElementById('copyEmailBtn');
+    if (!btn) return;
+    var email = 'ai.adityachouhan@gmail.com';
+    var originalLabel = btn.textContent;
+    btn.addEventListener('click', function () {
+      function fallbackCopy() {
+        var ta = document.createElement('textarea');
+        ta.value = email;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(email).catch(fallbackCopy);
+      } else {
+        fallbackCopy();
+      }
+      btn.textContent = 'Copied!';
+      btn.disabled = true;
+      setTimeout(function () { btn.textContent = originalLabel; btn.disabled = false; }, 2000);
+    });
+  })();
+</script>
