@@ -1,11 +1,11 @@
 # Signal Engine — public demo
 
 Composite signal scoring, rebuilt from scratch on public data. Same mechanism
-designed for Sydon's Amazon Signal Engine (score real activity instead of
-buying a static contact list), applied fresh here to open-source dev-tool
-companies using only GitHub's public API.
+designed in a prior GTM engineering role for Amazon seller signal detection
+(score real activity instead of buying a static contact list), applied fresh
+here to open-source dev-tool companies using only GitHub's public API.
 
-No Sydon code, data, or credentials used anywhere in this repo.
+No employer code, data, or credentials used anywhere in this repo.
 
 **Write-up:** https://aditya-chouhan.github.io/signal-engine-demo/
 

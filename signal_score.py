@@ -1,11 +1,12 @@
 """
 Signal-based company prioritization — public demo.
 
-Same composite-scoring mechanism designed for Sydon's Amazon Signal Engine
-(rank collapse, Buy Box loss, review-velocity spikes), rebuilt from scratch
-here on a different, fully public data source: GitHub's commit-activity API.
+Same composite-scoring mechanism designed in a prior GTM engineering role
+for Amazon seller signal detection (rank collapse, Buy Box loss, review-velocity
+spikes), rebuilt from scratch here on a different, fully public data source:
+GitHub's commit-activity API.
 
-No Sydon code, data, or credentials used anywhere in this file. The concept
+No employer code, data, or credentials used anywhere in this file. The concept
 (detect real distress/growth signals instead of relying on a static contact
 list) is the same; the implementation and data source are new.
 
